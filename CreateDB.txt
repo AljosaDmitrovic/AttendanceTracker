@@ -1,0 +1,106 @@
+CREATE TABLE [dbo].[Semesters]
+(
+	[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
+    [Name] NVARCHAR(50) NOT NULL, 
+    [StartDay] INT NULL, 
+    [StartMonth] INT NULL, 
+    [EndDay] INT NULL,
+    [EndMonth] INT NULL
+)
+
+CREATE TABLE [dbo].[Lectures]
+(
+	[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
+    [Name] NVARCHAR(50) NOT NULL, 
+    [StudyYear] INT NULL, 
+    [SemesterID] INT NULL, 
+    CONSTRAINT [FK_Lectures_ToSemesters] FOREIGN KEY ([SemesterID]) REFERENCES [Semesters]([Id])
+)
+
+CREATE TABLE [dbo].[Modules]
+(
+	[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
+    [Name] NVARCHAR(50) NOT NULL, 
+    [Duration] INT NULL
+)
+
+CREATE TABLE [dbo].[Rooms]
+(
+	[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
+    [Name] NVARCHAR(50) NOT NULL, 
+    [AvailablePlaces] INT NULL, 
+)
+
+CREATE TABLE [dbo].[Groups]
+(
+	[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
+    [LectureID] INT NOT NULL, 
+    [RoomId] INT NULL, 
+    [Name] NVARCHAR(50) NULL, 
+    [Description] NVARCHAR(50) NULL, 
+    CONSTRAINT [FK_Groups_ToLectures] FOREIGN KEY ([LectureId]) REFERENCES [Lectures]([Id]), 
+    CONSTRAINT [FK_Groups_ToRooms] FOREIGN KEY ([RoomId]) REFERENCES [Rooms]([Id])
+)
+
+
+CREATE TABLE [dbo].[Users]
+(
+	[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
+    [Name] NVARCHAR(50) NOT NULL, 
+    [Surname] NVARCHAR(50) NULL, 
+    [IndexNumber] NVARCHAR(50) NULL, 
+    [Email] NVARCHAR(50) NOT NULL, 
+    [PhoneNumber] NVARCHAR(50) NULL, 
+    [SignDate] DATE NULL, 
+    [IsStudent] BIT NULL,
+    [LoginName] NVARCHAR(40) NOT NULL,
+    [PasswordHash] NVARCHAR(128) NULL, 
+    [PasswordSalt] NVARCHAR(128) NULL, 
+    [ModuleID] INT NULL, 
+    CONSTRAINT [FK_Users_ToModules] FOREIGN KEY ([ModuleID]) REFERENCES [Modules]([Id]), 
+)
+
+CREATE TABLE [dbo].[StudentGroups]
+(
+	[UserID] INT NOT NULL, 
+    [GroupID] INT NOT NULL, 
+	CONSTRAINT [PK_StudentGroups] PRIMARY KEY (UserID,GroupID), 
+    CONSTRAINT [FK_StudentGroups_ToUsers] FOREIGN KEY ([UserID]) REFERENCES [Users]([Id]), 
+    CONSTRAINT [FK_StudentGroups_ToGroups] FOREIGN KEY ([GroupID]) REFERENCES [Groups]([Id])
+)
+CREATE TABLE [dbo].[Appointments]
+(
+	[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
+    [GroupID] INT NOT NULL, 
+    [StartTime] TIME NULL, 
+    [EndTime] TIME NULL, 
+    [OpenTime] TIME NULL, 
+    [Day] INT NOT NULL, 
+    [Active] BIT NULL,
+    CONSTRAINT [FK_Appointments_ToGroups] FOREIGN KEY ([GroupID]) REFERENCES [Groups]([Id])
+)
+
+CREATE TABLE [dbo].[SignEntries]
+(
+	[UserID] INT NOT NULL, 
+    [AppointmentID] INT NOT NULL, 
+	[Year] INT NOT NULL,
+	[Week1] NVARCHAR(100) NULL, 
+	[Week2] NVARCHAR(100) NULL,
+	[Week3] NVARCHAR(100) NULL,
+	[Week4] NVARCHAR(100) NULL,
+	[Week5] NVARCHAR(100) NULL,
+	[Week6] NVARCHAR(100) NULL,
+	[Week7] NVARCHAR(100) NULL,
+	[Week8] NVARCHAR(100) NULL,
+	[Week9] NVARCHAR(100) NULL,
+	[Week10] NVARCHAR(100) NULL,
+	[Week11] NVARCHAR(100) NULL,
+	[Week12] NVARCHAR(100) NULL,
+	[Week13] NVARCHAR(100) NULL,
+	[Week14] NVARCHAR(100) NULL,
+	[Week15] NVARCHAR(100) NULL,
+    CONSTRAINT [PK_SignEntries] PRIMARY KEY (UserID,AppointmentID,Year), 
+    CONSTRAINT [FK_SignEntries_ToUsers] FOREIGN KEY ([UserID]) REFERENCES [Users]([Id]), 
+    CONSTRAINT [FK_SignEntries_ToAppintments] FOREIGN KEY ([AppointmentID]) REFERENCES [Appointments]([Id])
+)
